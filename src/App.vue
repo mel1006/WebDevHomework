@@ -19,7 +19,7 @@ export default {
 </script>
 
 <style>
-
+html, body, #app { margin: 0; padding: 0; }
 #app { font-family: Avenir, Helvetica, Arial, sans-serif; color: #2c3e50; }
 .app-main { padding: 16px; min-height: calc(100vh - 140px); /* leave space for header/footer */ }
 </style>
