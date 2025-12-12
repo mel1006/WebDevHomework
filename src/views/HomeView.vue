@@ -55,7 +55,7 @@ header { display: block ; }
 
 .posts-list { display:flex; flex-direction:column; gap:8px; }
 
-/* responsive: stack on small screens */
+
 @media (max-width: 900px) {
   .layout { grid-template-columns: 1fr; padding: 0 12px; }
   .sidebar-left { order: 2; }
