@@ -1,11 +1,13 @@
 <template>
   <div class="home-page">
-    <header><h1>Main Page - Posts</h1></header>
+    <header>
+      <h1>Main Page - Posts</h1>
+    </header>
 
     <div class="layout">
       <Sidebar class="sidebar-left" />
       <main class="content">
-       
+
 
         <section class="posts-list">
           <Post v-for="p in posts" :key="p.id" :post-id="p.id" />
@@ -31,14 +33,22 @@ export default {
   },
   methods: {
     resetAllLikes() { this.$store.commit('resetLikes') }
+  },
+  created() {
+    this.$store.dispatch('fetchPosts')
   }
 }
 </script>
 
 <style scoped>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-.home-page header { text-align:center; margin-bottom:12px; }
+.home-page header {
+  text-align: center;
+  margin-bottom: 12px;
+}
 
 .layout {
   display: flex;
@@ -48,17 +58,49 @@ export default {
   justify-content: space-between;
 }
 
-header { display: block ; }
-.content { min-width: 0; }
-.controls { margin: 12px 0; text-align: left; margin-bottom: 5rem; }
-.reset-btn { background:#ff6b6b; color:#fff; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; width: 100%; }
+header {
+  display: block;
+}
 
-.posts-list { display:flex; flex-direction:column; gap:8px; }
+.content {
+  min-width: 0;
+}
+
+.controls {
+  margin: 12px 0;
+  text-align: left;
+  margin-bottom: 5rem;
+}
+
+.reset-btn {
+  background: #ff6b6b;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
 
 @media (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; padding: 0 12px; }
-  .sidebar-left { order: 2; }
-  .content { order: 1; }
+  .layout {
+    grid-template-columns: 1fr;
+    padding: 0 12px;
+  }
+
+  .sidebar-left {
+    order: 2;
+  }
+
+  .content {
+    order: 1;
+  }
 }
 </style>
