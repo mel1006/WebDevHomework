@@ -3,7 +3,7 @@
     <header>
       <h1>Main Page - Posts</h1>
     </header>
-
+    <button class="logout-btn" @click="logout">Logout</button>
     <div class="layout">
       <Sidebar class="sidebar-left" />
       <main class="content">
@@ -32,7 +32,22 @@ export default {
     posts() { return this.$store.getters.posts }
   },
   methods: {
-    resetAllLikes() { this.$store.commit('resetLikes') }
+    resetAllLikes() { this.$store.commit('resetLikes') },
+
+    logout() {
+      fetch('http://localhost:3000/api/logout', {
+        method: 'POST',
+        credentials: 'include'
+      })
+        .then(() => {
+          this.$store.commit('setUser', null);
+          this.$router.push('/login');
+        })
+        .catch(err => console.error(err));
+    }
+
+
+
   },
   created() {
     this.$store.dispatch('fetchPosts')
@@ -80,6 +95,16 @@ header {
   border-radius: 4px;
   cursor: pointer;
   width: 100%;
+}
+
+.logout-btn {
+  background: #ff6b6b;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100px;
 }
 
 .posts-list {

@@ -180,6 +180,16 @@ app.get("/api/authenticate", async (req, res) => {
   }
 });
 
+app.post("/api/logout", (req, res) => {
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false,
+  });
+
+  res.json({ message: "Logged out" });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

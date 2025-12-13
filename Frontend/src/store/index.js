@@ -52,7 +52,6 @@ export default createStore({
       }
     },
     logout({ commit }) {
-      // optional Backend-Logout
       commit("clearUser");
     },
   },
