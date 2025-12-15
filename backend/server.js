@@ -46,7 +46,7 @@ app.post("/api/signup", async (req, res) => {
     res
       .status(201)
       .cookie("jwt", token, { maxAge: 6000000, httpOnly: true })
-      .json({ user_id: newUser.rows[0].id }).send;
+      .json({ token: token, user_id: newUser.rows[0].id }); 
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error: " + err.message);
@@ -66,13 +66,13 @@ app.post("/api/login", async (req, res) => {
     const validPassword = await bcrypt.compare(password, user.rows[0].password);
     if (!validPassword) return res.status(400).json("Invalid password");
 
-    const token = jwt.sign({ userID: user.rows[0].id, email }, SECRET_KEY, {
+    const token = jwt.sign({ userId: user.rows[0].id, email }, SECRET_KEY, {
       expiresIn: "1h",
     });
     res
       .status(201)
       .cookie("jwt", token, { maxAge: 6000000, httpOnly: true })
-      .json({ user_id: user.rows[0].id }).send;
+      .json({ token: token, user_id: user.rows[0].id });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");

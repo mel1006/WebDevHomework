@@ -1,48 +1,36 @@
 <template>
-  <article class="post">
+  <article class="post" @click="goToPost">
     <div class="post-header">
-      <img class="avatar" :src="post.profile_image" alt="profile" />
       <div class="meta">
-        <div class="author">{{ post.author }}</div>
-        <div class="date">{{ post.date }}</div>
+        <div class="author">User ID: {{ post.user_id }}</div> 
+        <div class="date">{{ formatDate(post.date) }}</div>
       </div>
     </div>
-
-    <p class="post-text">{{ post.text }}</p>
-
-    <img v-if="post.image_data" class="post-image" :src="post.image_data" alt="post image" />
-
-    <div class="post-actions">
-      <button @click="like" class="like-btn">Like</button>
-      <span class="likes-count">{{ post.likes }}</span>
-    </div>
+    <p class="post-text">{{ post.body }}</p> 
   </article>
 </template>
 
 <script>
 export default {
   name: 'Post',
-  props: { postId: { type: Number, required: true } },
-  computed: {
-    post() {
-      return this.$store.getters.postById(this.postId) || { author: '', date: '', text: '', profile_image: '', image_data: null, likes: 0 }
-    }
+  props: { 
+    post: { type: Object, required: true } 
   },
   methods: {
-    like() { this.$store.commit('incrementLike', this.postId) }
+    goToPost() {
+      this.$router.push(`/posts/${this.post.id}`);
+    },
+    formatDate(dateString) {
+        if(!dateString) return '';
+        return new Date(dateString).toLocaleDateString();
+    }
   }
 }
 </script>
 
 <style scoped>
-.post { border:1px solid #eee; padding:12px; margin:8px 0; border-radius:6px; background:#fff; }
-.post-header { display:flex; gap:12px; align-items:center; margin-bottom:8px; }
-.avatar { width:48px; height:48px; border-radius:50%; object-fit:cover; }
-.meta .author { font-weight:700; }
-.meta .date { font-size:0.85rem; color:#666; }
-.post-text { margin:8px 0; white-space:pre-wrap; }
-.post-image { max-width:100%; border-radius:6px; margin-top:8px; }
-.post-actions { display:flex; gap:10px; align-items:center; margin-top:10px; }
-.like-btn { background:#42b983; color:#fff; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; }
-.likes-count { font-weight:600; }
+.post { border:1px solid #eee; padding:12px; margin:8px 0; border-radius:6px; background:#fff; cursor: pointer; transition: box-shadow 0.2s; }
+.post:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.meta { font-size: 0.85rem; color: #666; margin-bottom: 8px; }
+.post-text { white-space:pre-wrap; margin:8px 0; }
 </style>

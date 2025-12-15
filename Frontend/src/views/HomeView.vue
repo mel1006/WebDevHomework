@@ -1,85 +1,78 @@
 <template>
   <div class="home-page">
-    <header>
-      <h1>Main Page - Posts</h1>
-    </header>
-    <button class="logout-btn" @click="logout">Logout</button>
+    <header><h1>Main Page - Posts</h1></header>
     <div class="layout">
       <Sidebar class="sidebar-left" />
       <main class="content">
+        <div class="controls">
 
-
+          <button @click="logout" class="logout-btn">Logout</button>
+          <button @click="$router.push('/add')" class="add-btn">Add Post</button>
+          <button @click="deleteAllPosts" class="delete-btn">Delete All</button>
+        </div>
         <section class="posts-list">
-  <div
-    v-for="p in posts"
-    :key="p.id"
-    class="post-card"
-    @click="openPost(p.id)"
-  >
-    <div class="post-meta">
-      <span>#{{ p.id }}</span>
-      <span v-if="p.created_at">{{ formatDate(p.created_at) }}</span>
-    </div>
-    <div class="post-body">{{ p.body }}</div>
-  </div>
-</section>
+          <div v-if="posts.length === 0">No posts found. Add one!</div>
 
-<div class="controls">
-  <button class="add-btn" @click="$router.push('/add')">Add Post</button>
-  <button class="delete-btn" @click="deleteAll">Delete all posts</button>
-</div>
+          <Post v-for="p in posts" :key="p.id" :post="p" />
+        </section>
       </main>
-      <Sidebar class="sidebar-right" />
     </div>
   </div>
 </template>
 
 <script>
-
+import Post from '@/components/Post.vue'
 import Sidebar from '@/components/Sidebar.vue'
 
 export default {
   name: 'HomeView',
-  components: { Sidebar },
-  computed: {
-    posts() { return this.$store.getters.posts }
+  components: { Post, Sidebar },
+  data() {
+    return {
+      posts: [] 
+    }
+  },
+  async mounted() {
+    await this.fetchPosts();
   },
   methods: {
-    openPost(id) {
-  this.$router.push(`/posts/${id}`);
-},
-
-formatDate(iso) {
-  return new Date(iso).toLocaleString();
-},
-
-async deleteAll() {
-  const token = localStorage.getItem("token");
-  if (!token) return;
-
-  await fetch("http://localhost:3000/api/posts", {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  this.$store.dispatch("fetchPosts");
-},
-
- logout() {
-  localStorage.removeItem("token");
-  this.$store.commit("setUser", null);
-  this.$router.push("/login");
-}
-
-
-
-  },
-  created() {
-    this.$store.dispatch('fetchPosts')
+    logout() {
+      localStorage.removeItem('token');
+      // rdirect to login 
+      this.$router.push('/login');
+    },
+    async fetchPosts() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        this.logout();
+        return;
+      }
+      try {
+        const res = await fetch('http://localhost:3000/api/posts', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          this.posts = await res.json();
+        } else if (res.status === 401 || res.status === 403) {
+          this.logout();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    async deleteAllPosts() {
+        const token = localStorage.getItem('token');
+        if(!confirm("Delete all posts?")) return;
+        
+        await fetch('http://localhost:3000/api/posts', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        this.fetchPosts(); 
+    }
   }
 }
 </script>
-
 <style scoped>
 * {
   box-sizing: border-box;
@@ -91,11 +84,11 @@ async deleteAll() {
 }
 
 .layout {
-  display: flex;
+  display: grid;
+  grid-template-columns: 240px 1fr;
   gap: 16px;
-  width: 100%;
+  max-width: 1100px;
   margin: 0 auto;
-  justify-content: space-between;
 }
 
 header {
@@ -108,8 +101,8 @@ header {
 
 .controls {
   margin: 12px 0;
-  text-align: left;
-  margin-bottom: 5rem;
+  display:flex;
+  gap:10px;
 }
 
 .add-btn {
@@ -119,7 +112,6 @@ header {
   padding: 8px 12px;
   border-radius: 4px;
   cursor: pointer;
-  width: 100%;
 }
 
 .delete-btn {
@@ -129,17 +121,15 @@ header {
   padding: 8px 12px;
   border-radius: 4px;
   cursor: pointer;
-  width: 100%;
 }
 
 .logout-btn {
-  background: #ff6b6b;
+  background: #7f8c8d;
   color: #fff;
   border: none;
   padding: 8px 12px;
   border-radius: 4px;
   cursor: pointer;
-  width: 100px;
 }
 
 .posts-list {

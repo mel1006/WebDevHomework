@@ -35,27 +35,27 @@ export default {
         async login() {
             const payload = { email: this.email, password: this.password };
 
-            await fetch("http://localhost:3000/api/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify(payload)
-            })
-                .then(async (res) => {
-                    const text = await res.text();
-                    if (res.ok) {
-                        console.log("Login successful:", text);
-                        await this.$router.push("/");
-                    } else {
-                        this.errorMessage = "Login failed";
-                    }
-                })
-                .catch((e) => {
-                    this.errorMessage = "Server error: " + e.message;
-                    console.error("Login error:", e);
+            try {
+                const res = await fetch("http://localhost:3000/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify(payload)
                 });
 
-            // Reset lokale Felder
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem("token", data.token); 
+                    console.log("Login successful");
+                    this.$router.push("/");
+                } else {
+                    this.errorMessage = "Login failed";
+                }
+            } catch (e) {
+                this.errorMessage = "Server error: " + e.message;
+                console.error("Login error:", e);
+            }
+
             this.email = "";
             this.password = "";
         }
