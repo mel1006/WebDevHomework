@@ -10,11 +10,24 @@
 
 
         <section class="posts-list">
-          <Post v-for="p in posts" :key="p.id" :post-id="p.id" />
-        </section>
-        <div class="controls">
-          <button @click="resetAllLikes" class="reset-btn">Reset Likes</button>
-        </div>
+  <div
+    v-for="p in posts"
+    :key="p.id"
+    class="post-card"
+    @click="openPost(p.id)"
+  >
+    <div class="post-meta">
+      <span>#{{ p.id }}</span>
+      <span v-if="p.created_at">{{ formatDate(p.created_at) }}</span>
+    </div>
+    <div class="post-body">{{ p.body }}</div>
+  </div>
+</section>
+
+<div class="controls">
+  <button class="add-btn" @click="$router.push('/add')">Add Post</button>
+  <button class="delete-btn" @click="deleteAll">Delete all posts</button>
+</div>
       </main>
       <Sidebar class="sidebar-right" />
     </div>
@@ -22,29 +35,41 @@
 </template>
 
 <script>
-import Post from '@/components/Post.vue'
+
 import Sidebar from '@/components/Sidebar.vue'
 
 export default {
   name: 'HomeView',
-  components: { Post, Sidebar },
+  components: { Sidebar },
   computed: {
     posts() { return this.$store.getters.posts }
   },
   methods: {
-    resetAllLikes() { this.$store.commit('resetLikes') },
+    openPost(id) {
+  this.$router.push(`/posts/${id}`);
+},
 
-    logout() {
-      fetch('http://localhost:3000/api/logout', {
-        method: 'POST',
-        credentials: 'include'
-      })
-        .then(() => {
-          this.$store.commit('setUser', null);
-          this.$router.push('/login');
-        })
-        .catch(err => console.error(err));
-    }
+formatDate(iso) {
+  return new Date(iso).toLocaleString();
+},
+
+async deleteAll() {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  await fetch("http://localhost:3000/api/posts", {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  this.$store.dispatch("fetchPosts");
+},
+
+ logout() {
+  localStorage.removeItem("token");
+  this.$store.commit("setUser", null);
+  this.$router.push("/login");
+}
 
 
 
@@ -87,7 +112,17 @@ header {
   margin-bottom: 5rem;
 }
 
-.reset-btn {
+.add-btn {
+  background: #42b983;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.delete-btn {
   background: #ff6b6b;
   color: #fff;
   border: none;
@@ -113,6 +148,28 @@ header {
   gap: 8px;
 }
 
+.post-card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  background: #fff;
+}
+
+.post-card:hover {
+  background: #f7f7f7;
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.post-body {
+  margin-top: 8px;
+}
 
 @media (max-width: 900px) {
   .layout {
