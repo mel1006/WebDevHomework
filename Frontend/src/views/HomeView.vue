@@ -1,6 +1,8 @@
 <template>
   <div class="home-page">
-    <header><h1>Main Page - Posts</h1></header>
+    <header>
+      <h1>Main Page - Posts</h1>
+    </header>
     <div class="layout">
       <Sidebar class="sidebar-left" />
       <main class="content">
@@ -29,7 +31,7 @@ export default {
   components: { Post, Sidebar },
   data() {
     return {
-      posts: [] 
+      posts: []
     }
   },
   async mounted() {
@@ -38,6 +40,10 @@ export default {
   methods: {
     logout() {
       localStorage.removeItem('token');
+      fetch('http://localhost:3000/api/logout', {
+        method: 'POST',
+        credentials: 'include'
+      }).catch(err => console.error(err));
       // rdirect to login 
       this.$router.push('/login');
     },
@@ -61,14 +67,14 @@ export default {
       }
     },
     async deleteAllPosts() {
-        const token = localStorage.getItem('token');
-        if(!confirm("Delete all posts?")) return;
-        
-        await fetch('http://localhost:3000/api/posts', {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        this.fetchPosts(); 
+      const token = localStorage.getItem('token');
+      if (!confirm("Delete all posts?")) return;
+
+      await fetch('http://localhost:3000/api/posts', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      this.fetchPosts();
     }
   }
 }
@@ -101,8 +107,8 @@ header {
 
 .controls {
   margin: 12px 0;
-  display:flex;
-  gap:10px;
+  display: flex;
+  gap: 10px;
 }
 
 .add-btn {

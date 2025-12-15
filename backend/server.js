@@ -46,7 +46,7 @@ app.post("/api/signup", async (req, res) => {
     res
       .status(201)
       .cookie("jwt", token, { maxAge: 6000000, httpOnly: true })
-      .json({ token: token, user_id: newUser.rows[0].id }); 
+      .json({ token: token, user_id: newUser.rows[0].id });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error: " + err.message);
@@ -70,9 +70,14 @@ app.post("/api/login", async (req, res) => {
       expiresIn: "1h",
     });
     res
-      .status(201)
-      .cookie("jwt", token, { maxAge: 6000000, httpOnly: true })
-      .json({ token: token, user_id: user.rows[0].id });
+      .status(201) //set jwt as cookie
+      .cookie("jwt", token, {
+        maxAge: 6000000,
+        httpOnly: true,
+        sameSite: "lax",
+        secure: false,
+      })
+      .json({ token: token, user_id: user.rows[0].id }); //redundant implementation of sending token in response body
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
